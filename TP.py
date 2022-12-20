@@ -137,6 +137,7 @@ def rk4(u,f,dt,*args):
     k3 = f(u+dt*k2/2,*args)
     k4 = f(u+k3*dt,*args)
     return u + dt/6 *(k1+2*(k2+k3)+k4)
+    
 
 def soliton(x,t,c,a):
     return c/2 * np.cosh(np.sqrt(c)/2*(x-c*t-a))**(-2)
@@ -163,30 +164,11 @@ def solution_periodic(x,dx,nx,dt,nt):
     return u
 
 def rhs_q4_rk4(u,d1m2nd):
-    return -3*(d1m2nd@u**2)
+    return (d1m2nd@u**2)
 
-def solution_rk4_BE(x,dx,nx,dt,nt):
-    d1m2nd = d1_mat_periodic(nx,dx)
-    d3m2nd = d3_mat_periodic(nx,dx)
-
-    u = np.empty((nt+1,nx))
-    u[0] = 10/3 * np.cos(np.pi*x/20)
-    for i in range(nt):
-        u[i+1] = rk4(u[i],rhs_q4_rk4,dt,d1m2nd)-d3m2nd
-    return u
-
-# Entre temps j'ai redécouvert `np.eye` : je laisse cette fonction ici, même si elle ne sera pas utilisé.
-def Ones(nx):
-    diagonals = [1]
-    offsets = [0]
-    return diags(diagonals,offsets,shape=(nx,nx)).A
-
-def q4_solver(x,dx,nx,dt,nt):
-    d3m2nd = d3_mat_periodic(nx,dx)
-    I = np.eye(nx,nx)
-    k = np.linalg.inv(I+d3m2nd)
-
-    u = np.empty((nt+1,nx))
-    u[0] = 10/3 * np.cos(np.pi*x/20)
-    for i in range(nt):
-        u[i+1] = k
+def q4_rk4(u,f,dt,*args):
+    k1 = f(u,*args)
+    k2 = f(u+dt*k1/2,*args)
+    k3 = f(u+dt*k2/2,*args)
+    k4 = f(u+k3*dt,*args)
+    return (k1+2*(k2+k3)+k4)/6
