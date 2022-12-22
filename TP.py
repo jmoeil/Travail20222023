@@ -272,7 +272,7 @@ def q4_rk4(u,f,dt,*args):
 
 def q4_solution_periodic(x,dx,nx,dt,nt):
     '''
-    Constructs the solution array to the problem at-hand with periodic conditions.
+    Constructs the solution array to Problem 4 at-hand with periodic conditions.
     
     Parameters
     ----------
@@ -298,5 +298,5 @@ def q4_solution_periodic(x,dx,nx,dt,nt):
     q4 = np.empty((nt+1,nx))
     q4[0] = 10/3 * np.cos(np.pi*x/20)
     for i in range(nt):
-        q4[i+1] = k@q4[i]-3*dt*k@q4_rk4(q4[i],rhs_q4_rk4,dt,B)
+        q4[i+1] = k@(q4[i]-3*dt*q4_rk4(q4[i],rhs_q4_rk4,dt,B))
     return q4
